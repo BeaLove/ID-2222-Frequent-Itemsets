@@ -1,23 +1,29 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Driver{
+    //Constants
+    private static final int THRESHOLD = 3;
 
-    public static void main(String[] args) {
-        String filename = args[0];
+    public static void main(String[] args) throws FileNotFoundException {
+
+        String filename = "baskets.dat";
         ArrayList<ArrayList<Integer>> baskets = readFromFile(filename);
-        for (int i = 0; i < 5; i++){
-            int item = baskets.get(i).get(i);
-            System.out.print(item + " ");
+        for(ArrayList<Integer> list : baskets){
+            for(int i = 0; i < list.size(); i++){
+                System.out.print(list.get(i) + " ");
+            }
+            System.out.println();
         }
-        System.out.println(" ");
+
     }
 
-    public static ArrayList<ArrayList<Integer>> readFromFile(String filename){
+    public static ArrayList<ArrayList<Integer>> readFromFile(String filename) throws FileNotFoundException {
         ArrayList<ArrayList<Integer>> baskets = new ArrayList<>();
-        try {
             // pass the path to the file as a parameter
-            File file =
-                    new File(filename);
+            File file = new File(filename);
             Scanner sc = new Scanner(file);
             while (sc.hasNextLine()){
                 String s = sc.nextLine();
@@ -29,9 +35,6 @@ public class Driver{
                 baskets.add(basket);
             }
         sc.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return baskets;
     }
 }
