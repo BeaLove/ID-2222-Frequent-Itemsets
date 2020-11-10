@@ -2,6 +2,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.HashSet;
+import java.util.HashMap;
 
 public class Driver{
     //Constants
@@ -11,8 +13,18 @@ public class Driver{
 
         String filename = "baskets.dat";
         ArrayList<int[]> baskets = readFromFile(filename);
-        
-
+        int num_baskets = baskets.size();
+        int size_last_basket = baskets.get(num_baskets-1).length;
+        System.out.println("number baskets: " + num_baskets);
+        System.out.println("size of last basket: " + size_last_basket);
+        APriori apriori = new APriori();
+        HashMap<HashSet<Integer>, Integer> itemSets = apriori.createSingletons(baskets);
+        //debugging code prints all key value pairs!! 
+        itemSets.entrySet().forEach( entry -> {
+            System.out.println( entry.getKey() + " => " + entry.getValue() );
+        });
+        int size = itemSets.size();
+        System.out.println(size);
     }
 
     public static ArrayList<int[]> readFromFile(String filename) throws FileNotFoundException {
