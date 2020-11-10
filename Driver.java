@@ -14,17 +14,23 @@ public class Driver{
         String filename = "baskets.dat";
         ArrayList<int[]> baskets = readFromFile(filename);
         int num_baskets = baskets.size();
+        int THRESHOLD = num_baskets/100;
         int size_last_basket = baskets.get(num_baskets-1).length;
         System.out.println("number baskets: " + num_baskets);
         System.out.println("size of last basket: " + size_last_basket);
         APriori apriori = new APriori();
-        HashMap<HashSet<Integer>, Integer> itemSets = apriori.createSingletons(baskets);
+        HashMap<HashSet<Integer>, Integer> singletons = apriori.createSingletons(baskets);
         //debugging code prints all key value pairs!! 
-        itemSets.entrySet().forEach( entry -> {
+        singletons.entrySet().forEach( entry -> {
             System.out.println( entry.getKey() + " => " + entry.getValue() );
         });
-        int size = itemSets.size();
-        System.out.println(size);
+        int size = singletons.size();
+        System.out.println("singletons size: "+ size);
+        //pruning removes all key-value pairs where value is below threshold
+        HashMap<HashSet<Integer>, Integer> pruned_singletons = apriori.pruning(singletons, 1000);
+        System.out.println("after pruning: " + pruned_singletons.size());
+        System.out.println("original map after pruning: " + singletons.size());
+
     }
 
     public static ArrayList<int[]> readFromFile(String filename) throws FileNotFoundException {
