@@ -10,29 +10,24 @@ public class Driver{
     public static void main(String[] args) throws FileNotFoundException {
 
         String filename = "baskets.dat";
-        ArrayList<ArrayList<Integer>> baskets = readFromFile(filename);
-        for(ArrayList<Integer> list : baskets){
-            for(int i = 0; i < list.size(); i++){
-                System.out.print(list.get(i) + " ");
-            }
-            System.out.println();
-        }
+        ArrayList<int[]> baskets = readFromFile(filename);
+        
 
     }
 
-    public static ArrayList<ArrayList<Integer>> readFromFile(String filename) throws FileNotFoundException {
-        ArrayList<ArrayList<Integer>> baskets = new ArrayList<>();
+    public static ArrayList<int[]> readFromFile(String filename) throws FileNotFoundException {
+        ArrayList<int[]> baskets = new ArrayList<>();
             // pass the path to the file as a parameter
             File file = new File(filename);
             Scanner sc = new Scanner(file);
             while (sc.hasNextLine()){
                 String s = sc.nextLine();
                 String[] splitted = s.split(" ");
-                ArrayList<Integer> basket = new ArrayList<>();
+                int [] arr = new int[splitted.length];
                 for (int i = 0; i < splitted.length; i++){
-                    basket.add(Integer.parseInt(splitted[i]));
+                    arr[i] = Integer.parseInt(splitted[i]);
                 }
-                baskets.add(basket);
+                baskets.add(arr);
             }
         sc.close();
         return baskets;
