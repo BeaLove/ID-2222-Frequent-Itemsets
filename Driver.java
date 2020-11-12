@@ -12,12 +12,12 @@ public class Driver{
     public static void main(String[] args) throws FileNotFoundException {
 
         String filename = "baskets.dat";
-        ArrayList<int[]> baskets = readFromFile(filename);
+        ArrayList<HashSet<Integer>> baskets = readFromFile(filename);
         int num_baskets = baskets.size();
         int THRESHOLD = num_baskets/100;
-        int size_last_basket = baskets.get(num_baskets-1).length;
+        //int size_last_basket = baskets.get(num_baskets-1).;
         System.out.println("number baskets: " + num_baskets);
-        System.out.println("size of last basket: " + size_last_basket);
+        //System.out.println("size of last basket: " + size_last_basket);
         APriori apriori = new APriori();
         HashMap<HashSet<Integer>, Integer> singletons = apriori.createSingletons(baskets);
         //debugging code prints all key value pairs!! 
@@ -30,12 +30,18 @@ public class Driver{
         HashMap<HashSet<Integer>, Integer> pruned_singletons = apriori.pruning(singletons, 1000);
         System.out.println("after pruning: " + pruned_singletons.size());
         System.out.println("original map after pruning: " + singletons.size());
-        ArrayList<HashSet<Integer>> singletons_list = new ArrayList<>(singletons.keySet());
-        ArrayList<HashSet<Integer>> merged_sets = apriori.mergeItemsets(singletons_list);
+        //ArrayList<HashSet<Integer>> singletons_list = new ArrayList<>(singletons.keySet());
+        //PLACEHOLDER k for iteration count
+        int k = 1;
+        HashMap<HashSet<Integer>, Integer> merged_sets = apriori.mergeItemsets(singletons, k);
+        HashMap<HashSet<Integer>, Integer> doubletons = apriori.counter(baskets, merged_sets);
+        merged_sets.entrySet().forEach( entry -> {System.out.println( "doubletons " + entry.getKey() + "=>" + entry.getValue());});
 
     }
 
     public static ArrayList<HashSet<Integer>> readFromFile(String filename) throws FileNotFoundException {
+        //IN filename
+        //OUT market basket dataset ArrayList of sets of transactions with items represented as integers
         ArrayList<HashSet<Integer>> baskets = new ArrayList<>();
             // pass the path to the file as a parameter
             File file = new File(filename);
