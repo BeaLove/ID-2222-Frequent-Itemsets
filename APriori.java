@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class APriori{
     
@@ -40,4 +41,33 @@ public class APriori{
         map.entrySet().removeIf(entry -> entry.getValue() < threshold); //removes all key-value pairs if value is below support threshold
         return map;
     }
+
+    public HashMap<HashSet<Integer>, Integer> mergeItemsets(HashMap<HashSet<Integer>, Integer> sets, int k) {
+        //IN: HashMap of itemsets and counts, k = iteration round of A Priori
+        //OUT: HashMap where keys have been merged ( k <-- k-1)
+        
+        for (HashSet<Integer> set: sets.keySet()){
+            for (HashSet<Integer> otherset: sets.keySet()){
+                set.addAll(otherset);
+            }
+        }
+        sets.entrySet().removeIf(entry -> entry.getKey().size() < k); //remove any k-1 sets remaining (addAll wont add a set to itself)
+        return sets;
+    }
+
+    public HashMap<HashSet<Integer>, Integer> counter(ArrayList<HashSet<Integer>> baskets, HashMap<HashSet<Integer>, Integer> itemsets){
+        //IN: list of baskets of items, HashMap of itemsets and their counts
+        //OUT: HashMap of itemsets and counts
+        itemsets.replaceAll((key, value) -> value = 0); //set all counts from previous round to 0;
+        for (HashSet<Integer> basket: baskets){
+            for (HashSet<Integer> itemset: itemsets.keySet()){
+                if (basket.containsAll(itemset)){
+                    itemsets.put(itemset, itemsets.get(itemset) +1);
+                }
+            }
+        }
+        return itemsets;
+    }
+        
+    
 }

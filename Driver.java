@@ -30,22 +30,26 @@ public class Driver{
         HashMap<HashSet<Integer>, Integer> pruned_singletons = apriori.pruning(singletons, 1000);
         System.out.println("after pruning: " + pruned_singletons.size());
         System.out.println("original map after pruning: " + singletons.size());
+        ArrayList<HashSet<Integer>> singletons_list = new ArrayList<>(singletons.keySet());
+        ArrayList<HashSet<Integer>> merged_sets = apriori.mergeItemsets(singletons_list);
 
     }
 
-    public static ArrayList<int[]> readFromFile(String filename) throws FileNotFoundException {
-        ArrayList<int[]> baskets = new ArrayList<>();
+    public static ArrayList<HashSet<Integer>> readFromFile(String filename) throws FileNotFoundException {
+        ArrayList<HashSet<Integer>> baskets = new ArrayList<>();
             // pass the path to the file as a parameter
             File file = new File(filename);
             Scanner sc = new Scanner(file);
             while (sc.hasNextLine()){
                 String s = sc.nextLine();
                 String[] splitted = s.split(" ");
-                int [] arr = new int[splitted.length];
+                HashSet<Integer> basket = new HashSet<>();
+                //int [] arr = new int[splitted.length];
                 for (int i = 0; i < splitted.length; i++){
-                    arr[i] = Integer.parseInt(splitted[i]);
+                    basket.add(Integer.parseInt(splitted[i]));
                 }
-                baskets.add(arr);
+                
+                baskets.add(basket);
             }
         sc.close();
         return baskets;
