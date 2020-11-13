@@ -55,5 +55,12 @@ public class Testfile{
     for (Map.Entry<HashSet<Integer>, Integer> set: allSets2.entrySet()){
         System.out.println(set.getKey() + " " + set.getValue());
     }
+
+    int[] myList = {1, 2, 3, 4, 5, 6}
+    myList.
+    }
+    
+    public void generateSubset(HashSet<Integer> , int k) {
+        
     }
 }

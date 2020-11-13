@@ -46,7 +46,7 @@ public class APriori{
         return map;
     }
 
-    public HashMap<HashSet<Integer>, Integer> mergeItemsets(HashMap<HashSet<Integer>, Integer> sets_counts, int k) {
+    public HashMap<HashSet<Integer>, Integer> mergeItemsets(HashMap<HashSet<Integer>, Integer> sets_counts) {
         //IN: HashMap of itemsets and counts, k = iteration round of A Priori
         //OUT: HashMap where keys have been merged ( k <-- k-1)
         ArrayList<HashSet<Integer>> sets = new ArrayList<>(sets_counts.keySet());
@@ -75,6 +75,7 @@ public class APriori{
         }
         mergedSets.entrySet().removeIf(entry -> entry.getKey().size() < k); //remove any k-1 sets remaining (addAll wont add a set to itself)
         */
+        //mergedSets.entrySet().forEach( entry -> {System.out.println( "doubletons " + entry.getKey() + "=>" + entry.getValue());});
         return mergedSets;
     }
 
@@ -82,6 +83,7 @@ public class APriori{
         //IN: list of baskets of items, HashMap of itemsets and their counts
         //OUT: HashMap of itemsets and zeroed counts
         //itemsets.replaceAll((key, value) -> value = 0); //set all counts from previous round to 0;
+        System.out.println("hello in counter");
         for (HashSet<Integer> basket: baskets){
             for (HashSet<Integer> itemset: itemsets.keySet()){
                 if (basket.containsAll(itemset)){
@@ -89,6 +91,7 @@ public class APriori{
                 }
             }
         }
+        System.out.println("done in counter");
         return itemsets;
     }
         
