@@ -1,52 +1,68 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.HashSet;
-import java.util.HashMap;
+import java.util.*;
 
 public class Driver{
     //Constants
-    private static final int THRESHOLD = 3;
+    private static HashMap<Integer, Integer> count_elements;
+    private static final String filename = "input.dat";
 
     public static void main(String[] args) throws FileNotFoundException {
 
-        String filename = "baskets.dat";
-        ArrayList<int[]> baskets = readFromFile(filename);
-        int num_baskets = baskets.size();
-        int THRESHOLD = num_baskets/100;
-        int size_last_basket = baskets.get(num_baskets-1).length;
-        System.out.println("number baskets: " + num_baskets);
-        System.out.println("size of last basket: " + size_last_basket);
+        ArrayList<HashSet<Integer>> baskets = firstPass();
+        int THRESHOLD = baskets.size()/100;
+        System.out.println("Threshold" +  THRESHOLD);
         APriori apriori = new APriori();
-        HashMap<HashSet<Integer>, Integer> singletons = apriori.createSingletons(baskets);
-        //debugging code prints all key value pairs!! 
-        singletons.entrySet().forEach( entry -> {
-            System.out.println( entry.getKey() + " => " + entry.getValue() );
-        });
-        int size = singletons.size();
-        System.out.println("singletons size: "+ size);
-        //pruning removes all key-value pairs where value is below threshold
-        HashMap<HashSet<Integer>, Integer> pruned_singletons = apriori.pruning(singletons, 1000);
-        System.out.println("after pruning: " + pruned_singletons.size());
-        System.out.println("original map after pruning: " + singletons.size());
+        HashMap<Integer, Integer> freq_table = new HashMap<>();
+        //Filter out most frequent items
+        for(Map.Entry<Integer, Integer> entry : count_elements.entrySet()){
+            int val = entry.getValue();
+            if(THRESHOLD <= val ){
+                int key = entry.getKey();
+                freq_table.put(key, val);
+            }
+        }
 
+        HashMap<int[], Integer> multiples_freq = null;
+        apriori.secondPass(baskets, freq_table);
+
+
+        //print results
+        for(Map.Entry<int[], Integer> entry : multiples_freq.entrySet()){
+            int val = entry.getValue();
+            if(THRESHOLD <= val ){
+                int[] key = entry.getKey();
+                System.out.println("Array: " + Arrays.toString(key) + ", Frequency: " + val );
+            }
+        }
+
+
+
+        
     }
 
-    public static ArrayList<int[]> readFromFile(String filename) throws FileNotFoundException {
-        ArrayList<int[]> baskets = new ArrayList<>();
-            // pass the path to the file as a parameter
-            File file = new File(filename);
-            Scanner sc = new Scanner(file);
-            while (sc.hasNextLine()){
-                String s = sc.nextLine();
-                String[] splitted = s.split(" ");
-                int [] arr = new int[splitted.length];
-                for (int i = 0; i < splitted.length; i++){
-                    arr[i] = Integer.parseInt(splitted[i]);
+
+    public static ArrayList<HashSet<Integer>> firstPass() throws FileNotFoundException {
+        ArrayList<HashSet<Integer>> baskets = new ArrayList<>();
+        count_elements = new HashMap<>();
+        File file = new File(filename);
+        Scanner sc = new Scanner(file);
+        while (sc.hasNextLine()){
+            String s = sc.nextLine();
+            String[] splitted = s.split(" ");
+            HashSet<Integer> basket = new HashSet<>();
+            for (int i = 0; i < splitted.length; i++){
+                int val = Integer.parseInt(splitted[i]);
+                if(count_elements.containsKey(val)){
+                    count_elements.put(val, count_elements.get(val) + 1);
+                }else{
+                    count_elements.put(val, 1);
                 }
-                baskets.add(arr);
+                basket.add(val);
             }
+
+            baskets.add(basket);
+        }
         sc.close();
         return baskets;
     }

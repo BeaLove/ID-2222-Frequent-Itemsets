@@ -1,43 +1,78 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Arrays;
+import java.util.*;
 
 public class APriori{
-    
+    private HashMap<Set<Integer>, Integer> candidates;
+    /**
+     * Empty constructor
+     */
     public APriori(){
-
+        candidates = new HashMap<>();
     }
 
-    public HashMap<HashSet<Integer>, Integer> createSingletons(ArrayList<int[]> baskets) {
-        HashMap<HashSet<Integer>, Integer> singletons = new HashMap<>();
-        int num_baskets = baskets.size();
-        System.out.println("num baskets: " + num_baskets);
-        for (int b = 0; b< num_baskets; b++){ //for each basket
-            int num_items = baskets.get(b).length;
-            //System.out.println("current basket size: " + num_items);
-            for (int i = 0; i < num_items; i++){ //for each item in each basket
-                int item = baskets.get(b)[i];
-                //System.out.println(item);
-                //HashSet<Integer> singleton = new HashSet<>(baskets.get(b)[i]);
-                HashSet<Integer> singleton = new HashSet<>(); 
-                singleton.add(item); //create new hashset and add current item to it.
-                if (singletons.containsKey(singleton)){ //if we've already seen this item, increment its count by 1
-                    singletons.put(singleton, singletons.get(singleton) +1 );
-                }    
-                else {
-                    singletons.put(singleton, 1); //if item is new, count it once
+
+    public HashMap<Set<Integer>, Integer> secondPass(ArrayList<HashSet<Integer>> dataset,
+                                                     HashMap<Integer, Integer> freq_table) {
+        for (HashSet<Integer> basket : dataset) {
+            ArrayList<Integer> tmp = new ArrayList<>();
+            for (int item : basket) {
+                if (freq_table.containsKey(item)) {
+                    tmp.add(item);
                 }
-                /*itemSets.entrySet().forEach( entry -> {
-                    System.out.println( entry.getKey() + " => " + entry.getValue() );
-                });*/
+            }
+            if (tmp.size() != 0) {
+                if(tmp.size() >= 2){
+                    int[] test = new int[tmp.size()];
+                    for(int i = 0; i < tmp.size(); i++){
+                        test[i] = tmp.get(i);
+                    }
+                    System.out.println("INPUT: " + Arrays.toString(test));
+                    for(int i = 2; i < tmp.size(); i++){
+                        List<int[]> combinations = generate(test, i);
+                    }
+                    /*
+                    for(int [] itemset : combinations){
+                        System.out.println(Arrays.toString(itemset));
+                    }
+                    */
+
+                }
             }
         }
-        return singletons;
+        return candidates;
     }
 
-    public HashMap<HashSet<Integer>, Integer> pruning(HashMap<HashSet<Integer>, Integer> map, int threshold){
-        map.entrySet().removeIf(entry -> entry.getValue() < threshold); //removes all key-value pairs if value is below support threshold
-        return map;
+
+    private List<int[]> generate(int[] input, int k){
+        List<int[]> subsets = new ArrayList<>();
+        int[] s = new int[k];
+        if (k <= input.length) {
+            // first index sequence: 0, 1, 2, ...
+            for (int i = 0; (s[i] = i) < k - 1; i++);
+            subsets.add(getSubset(input, s));
+            for(;;) {
+                int i;
+                // find position of item that can be incremented
+                for (i = k - 1; i >= 0 && s[i] == input.length - k + i; i--);
+                if (i < 0) {
+                    break;
+                }
+                s[i]++;                    // increment this item
+                for (++i; i < k; i++) {    // fill up remaining items
+                    s[i] = s[i - 1] + 1;
+                }
+                subsets.add(getSubset(input, s));
+            }
+        }
+        return subsets;
     }
+
+    // generate actual subset by index sequence
+    private int[] getSubset(int[] input, int[] subset) {
+        int[] result = new int[subset.length];
+        for (int i = 0; i < subset.length; i++)
+            result[i] = input[subset[i]];
+        return result;
+    }
+
+
 }
