@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 
@@ -15,33 +16,20 @@ public class Driver {
         int num_baskets = baskets.size();
         int THRESHOLD = num_baskets/100; //1% frequency threshold
         //int size_last_basket = baskets.get(num_baskets-1).;
-        System.out.println("number baskets: " + num_baskets);
-        //System.out.println("size of last basket: " + size_last_basket);
         APriori apriori = new APriori();
         HashMap<Integer, Integer> singletons = apriori.createSingletons(baskets);
         //debugging code prints all key value pairs!!
         //singletons.entrySet().forEach( entry -> {System.out.println( entry.getKey() + " => " + entry.getValue() );});
-        int size = singletons.size();
-        System.out.println("singletons size: "+ size);
         //pruning removes all key-value pairs where value is below threshold
-        //HashMap<Set<Integer>, Integer> pruned_singletons = apriori.pruning(singletons, 10);
-        //System.out.println("after pruning: " + pruned_singletons.size());
-        //System.out.println("original map after pruning: " + singletons.size());
-        //ArrayList<Set<Integer>> singletons_list = new ArrayList<>(singletons.keySet());
-        //PLACEHOLDER k for iteration count
         int k = 1;
-        //HashMap<Integer, Integer> merged_sets = apriori.mergeItemsets(singletons);
+
         HashMap<Integer, Integer> pruned_singles = apriori.prune_singles(singletons, THRESHOLD);
-        //HashMap<Integer, Integer> itemSets = singletons;
-        //HashMap<Set<Integer>, Integer> pruned_singletons = apriori.prune(singletons, THRESHOLD);
+        pruned_singles.entrySet().forEach(entry -> System.out.println(entry.getKey() + " > " + entry.getValue()));
         Set<Integer> frequent_items = Sets.newHashSet(singletons.keySet());
-        
-        //XMLStreamWriterImpl.Element sets_counts;
+
+
         HashMap<Set<Integer>, Integer> sets_counts;
         do {
-            //itemSets = apriori.mergeItemsets(itemSets);
-            //k++;
-            //frequent_items = apriori.mergeItemsets(frequent_items, k);
             Long start_time = System.currentTimeMillis();
             k++;
             sets_counts = apriori.counter(baskets, frequent_items, k);
@@ -49,6 +37,15 @@ public class Driver {
             for (Map.Entry itemSet:sets_counts.entrySet()){
                 System.out.println(itemSet);
             }
+            if (k == 2){
+                Multimap<Integer, Integer> single_rules= apriori.singles_rules(sets_counts, pruned_singles);
+                System.out.println("single item rules");
+                single_rules.entries().forEach(entry -> System.out.println(entry.getKey() + "-->" + entry.getValue()));
+            }
+            HashMap<Set<Integer>, Integer> frequent_itemsets = new HashMap<>();
+            frequent_itemsets.putAll(sets_counts);
+            Multimap<Set<Integer>, Integer> rules = apriori.double_rules(sets_counts, frequent_itemsets, pruned_singles);
+            rules.entries().forEach(entry -> System.out.println(entry.getKey() + "-->" + entry.getValue()));
             frequent_items = apriori.merge(sets_counts.keySet());
             Long end_time = System.currentTimeMillis();
             System.out.println("Counting frequent sets took" + (end_time-start_time) + "ms");
