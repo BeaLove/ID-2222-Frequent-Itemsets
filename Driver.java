@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import org.checkerframework.checker.units.qual.A;
 
 
 public class Driver {
@@ -14,22 +15,33 @@ public class Driver {
         String filename = "baskets.dat";
         ArrayList<Set<Integer>> baskets = readFromFile(filename);
         int num_baskets = baskets.size();
+        ArrayList<Set<Integer>> sub_baskets = new ArrayList<>();
+        for (int i = 0; i < 10; i ++){
+            sub_baskets.add(baskets.get(i));
+        }
+
         int THRESHOLD = num_baskets/100; //1% frequency threshold
         //int size_last_basket = baskets.get(num_baskets-1).;
-        APriori apriori = new APriori();
-        HashMap<Integer, Integer> singletons = apriori.createSingletons(baskets);
+        APriori apriori = new APriori(1);
+        HashMap<Set<Integer>, Integer> frequent_items = apriori.createSingletons(sub_baskets);
         //debugging code prints all key value pairs!!
         //singletons.entrySet().forEach( entry -> {System.out.println( entry.getKey() + " => " + entry.getValue() );});
         //pruning removes all key-value pairs where value is below threshold
         int k = 1;
 
-        HashMap<Integer, Integer> pruned_singles = apriori.prune_singles(singletons, THRESHOLD);
-        pruned_singles.entrySet().forEach(entry -> System.out.println(entry.getKey() + " > " + entry.getValue()));
-        Set<Integer> frequent_items = Sets.newHashSet(singletons.keySet());
+        //HashMap<Integer, Integer> pruned_singles = apriori.prune_singles(singletons, THRESHOLD);
+        //pruned_singles.entrySet().forEach(entry -> System.out.println(entry.getKey() + " > " + entry.getValue()));
+        //Set<Integer> frequent_items = Sets.newHashSet(singletons.keySet());
 
 
         HashMap<Set<Integer>, Integer> sets_counts;
-        do {
+        while(k < 4){
+            k++;
+            sets_counts = apriori.count(frequent_items, k);
+            sets_counts = apriori.prune(sets_counts);
+            sets_counts.entrySet().forEach(entry -> System.out.println(entry.getKey() + " --> " + entry.getValue()));
+        }
+        /*do {
             Long start_time = System.currentTimeMillis();
             k++;
             sets_counts = apriori.counter(baskets, frequent_items, k);
@@ -51,7 +63,9 @@ public class Driver {
             System.out.println("Counting frequent sets took" + (end_time-start_time) + "ms");
             //k++;
         }
-        while (!sets_counts.isEmpty());
+        while (!sets_counts.isEmpty());*/
+
+
 
     }
 
